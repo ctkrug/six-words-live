@@ -46,18 +46,25 @@ the exact same six words.
 
 ## Status
 
-Early scaffold — see [`docs/VISION.md`](docs/VISION.md) for the full design and
-[`docs/BACKLOG.md`](docs/BACKLOG.md) for the build plan.
+The live wall, the daily prompt, and voting are built and working end to end — see
+[`docs/BACKLOG.md`](docs/BACKLOG.md) for what's shipped and what's left (the midnight
+archive and further hardening). See [`docs/VISION.md`](docs/VISION.md) for the full design.
 
 ## Local development
 
 ```bash
 npm install
+npm run db:migrate:local   # applies the schema to a local D1 database, once
 npm run dev
 ```
 
-See [`docs/VISION.md`](docs/VISION.md) and [`docs/DESIGN.md`](docs/DESIGN.md) for the product
-and design direction.
+`next dev` emulates the D1/KV bindings locally (see
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)), so the whole app — submitting, voting, the
+live wall — works against `npm run dev` without any Cloudflare deploy.
+
+See [`docs/VISION.md`](docs/VISION.md), [`docs/DESIGN.md`](docs/DESIGN.md), and
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the product, design, and technical
+direction.
 
 ## License
 
