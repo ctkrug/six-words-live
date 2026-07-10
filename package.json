@@ -1,0 +1,36 @@
+{
+  "name": "six-words-live",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "pages:build": "npx @cloudflare/next-on-pages",
+    "db:migrate:local": "wrangler d1 execute six-words-live --local --file=migrations/0001_init.sql",
+    "db:migrate:remote": "wrangler d1 execute six-words-live --remote --file=migrations/0001_init.sql"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@cloudflare/next-on-pages": "1.13.5",
+    "@cloudflare/workers-types": "4.20240718.0",
+    "@types/node": "20.14.11",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "eslint": "8.57.0",
+    "eslint-config-next": "14.2.5",
+    "typescript": "5.5.3",
+    "vitest": "2.0.3",
+    "wrangler": "3.65.1"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  }
+}
