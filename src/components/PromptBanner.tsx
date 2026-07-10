@@ -23,7 +23,7 @@ export function PromptBanner({ text }: PromptBannerProps) {
   );
 }
 
-function Squiggle({ className }: { className: string }) {
+function Squiggle({ className }: { className: string | undefined }) {
   return (
     <svg className={className} viewBox="0 0 200 14" preserveAspectRatio="none" aria-hidden="true">
       <path d="M2 8 C 20 2, 35 2, 50 8 S 80 14, 100 8 S 130 2, 150 8 S 180 14, 198 7" />
