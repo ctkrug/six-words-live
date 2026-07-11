@@ -23,6 +23,16 @@ describe("getOrCreateVisitorToken", () => {
     const { token } = getOrCreateVisitorToken("swl_id=abc=123==");
     expect(token).toBe("abc=123==");
   });
+
+  it("generates a new token for an empty cookie value", () => {
+    const { isNew } = getOrCreateVisitorToken("swl_id=");
+    expect(isNew).toBe(true);
+  });
+
+  it("generates a new token for a malformed cookie with no '='", () => {
+    const { isNew } = getOrCreateVisitorToken("swl_id");
+    expect(isNew).toBe(true);
+  });
 });
 
 describe("visitorCookieHeader", () => {
