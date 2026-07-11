@@ -33,6 +33,7 @@ export default function HomePage() {
   const seenIdsRef = useRef<Set<string>>(new Set());
   const promptIdRef = useRef<string | null>(null);
   const sortRef = useRef<SortMode>("new");
+  const wallErrorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setMuted(getStoredMute());
@@ -88,6 +89,12 @@ export default function HomePage() {
   useEffect(() => {
     sortRef.current = sort;
   }, [sort]);
+
+  useEffect(() => {
+    return () => {
+      if (wallErrorTimeoutRef.current) clearTimeout(wallErrorTimeoutRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     void loadPrompt();
@@ -166,7 +173,8 @@ export default function HomePage() {
         prev.map((entry) => (entry.id === entryId ? { ...entry, voteCount: target.voteCount, votedByMe: target.votedByMe } : entry)),
       );
       setWallError(error instanceof Error ? error.message : "Vote failed. Try again.");
-      setTimeout(() => setWallError(null), 3000);
+      if (wallErrorTimeoutRef.current) clearTimeout(wallErrorTimeoutRef.current);
+      wallErrorTimeoutRef.current = setTimeout(() => setWallError(null), 3000);
     }
   }
 
