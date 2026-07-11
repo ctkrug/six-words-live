@@ -6,6 +6,7 @@ import {
   hasSubmittedToday,
   insertEntry,
   listEntries,
+  listPastPrompts,
 } from "@/lib/db";
 import { createTestDb } from "./helpers/fakeD1";
 
@@ -129,6 +130,37 @@ describe("castVote", () => {
     await castVote(db, "e1", "voter-1");
     const result = await castVote(db, "e1", "voter-2");
     expect(result).toEqual({ voteCount: 2, alreadyVoted: false });
+  });
+});
+
+describe("listPastPrompts", () => {
+  it("returns an empty array when only today's prompt exists", async () => {
+    await getOrCreatePrompt(db, "2026-03-05", "today");
+    expect(await listPastPrompts(db, "2026-03-05")).toEqual([]);
+  });
+
+  it("excludes the current prompt and orders past days newest first", async () => {
+    await getOrCreatePrompt(db, "2026-03-03", "three days ago");
+    await getOrCreatePrompt(db, "2026-03-04", "yesterday");
+    await getOrCreatePrompt(db, "2026-03-05", "today");
+    const days = await listPastPrompts(db, "2026-03-05");
+    expect(days.map((d) => d.id)).toEqual(["2026-03-04", "2026-03-03"]);
+  });
+
+  it("annotates each past day with its entry count, including zero", async () => {
+    await getOrCreatePrompt(db, "2026-03-04", "yesterday");
+    await getOrCreatePrompt(db, "2026-03-05", "today");
+    await insertEntry(db, { id: "e1", promptId: "2026-03-04", body: "an entry from yesterday right here", authorToken: "a", createdAt: 1 });
+    const days = await listPastPrompts(db, "2026-03-05");
+    expect(days).toEqual([{ id: "2026-03-04", text: "yesterday", entryCount: 1 }]);
+  });
+
+  it("respects the limit argument", async () => {
+    await getOrCreatePrompt(db, "2026-03-01", "day one");
+    await getOrCreatePrompt(db, "2026-03-02", "day two");
+    await getOrCreatePrompt(db, "2026-03-03", "day three");
+    const days = await listPastPrompts(db, "2026-03-05", 2);
+    expect(days.map((d) => d.id)).toEqual(["2026-03-03", "2026-03-02"]);
   });
 });
 
