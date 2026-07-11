@@ -1,8 +1,8 @@
-# Design direction — Six Words Live
+# Design direction — Sestet
 
 ## 1. Aesthetic direction
 
-**Editorial serif.** Six Words Live is a literary journal for a shared daily writing prompt —
+**Editorial serif.** Sestet is a literary journal for a shared daily writing prompt —
 warm cream paper, deep ink-navy-black text, and a single coral "stamp" accent for the actions
 that matter (submit, upvote). It should feel like a well-typeset lit-mag page that happens to
 be alive, not a SaaS dashboard and not another dark-mode chat app. This is a deliberate break

@@ -1,4 +1,4 @@
-# Backlog — Six Words Live
+# Backlog — Sestet
 
 Epics and stories for the build. All start unchecked. Every story has verifiable acceptance
 criteria a later run can confirm true/false. **Epic 1, Story 1.1 is the wow moment** — it must

@@ -1,4 +1,4 @@
-# Vision — Six Words Live
+# Vision — Sestet
 
 ## The problem
 
@@ -17,7 +17,7 @@ than guessing. No account, no commitment, no skill floor: six words is short eno
 ## The core idea
 
 Legend has it Hemingway wrote a complete story in six words: *"For sale: baby shoes, never
-worn."* Six Words Live turns that into a daily shared prompt: everyone in the world gets the
+worn."* Sestet turns that into a daily shared prompt: everyone in the world gets the
 identical theme on the identical UTC day, writes exactly six words against it, and the moment
 they submit they land inside a live wall of everyone else's take on the same six words. Reading
 and upvoting each other's lines is as core to the loop as writing your own — the wall, not the

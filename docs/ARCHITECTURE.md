@@ -1,4 +1,4 @@
-# Architecture — Six Words Live
+# Architecture — Sestet
 
 ## Stack
 
