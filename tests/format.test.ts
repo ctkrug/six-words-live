@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { timeAgo } from "@/lib/format";
+import { formatArchiveDate, timeAgo } from "@/lib/format";
 
 describe("timeAgo", () => {
   it("returns 'just now' for anything under a minute", () => {
@@ -21,5 +21,21 @@ describe("timeAgo", () => {
 
   it("clamps a future createdAt (clock skew) to 'just now' instead of a negative value", () => {
     expect(timeAgo(5000, 1000)).toBe("just now");
+  });
+});
+
+describe("formatArchiveDate", () => {
+  it("renders a date key as a full weekday/month/day/year label", () => {
+    expect(formatArchiveDate("2026-03-05")).toBe("Thursday, March 5, 2026");
+  });
+
+  it("stays on the same UTC day regardless of local timezone shift", () => {
+    // A naive `new Date("2026-01-01")` interpreted in a negative-UTC-offset
+    // timezone would render as December 31 — formatArchiveDate must not.
+    expect(formatArchiveDate("2026-01-01")).toBe("Thursday, January 1, 2026");
+  });
+
+  it("handles a year boundary correctly", () => {
+    expect(formatArchiveDate("2025-12-31")).toBe("Wednesday, December 31, 2025");
   });
 });
