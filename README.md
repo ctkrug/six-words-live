@@ -46,9 +46,10 @@ the exact same six words.
 
 ## Status
 
-The live wall, the daily prompt, and voting are built and working end to end — see
-[`docs/BACKLOG.md`](docs/BACKLOG.md) for what's shipped and what's left (the midnight
-archive and further hardening). See [`docs/VISION.md`](docs/VISION.md) for the full design.
+The live wall, the daily prompt, voting, and the midnight archive are built and working
+end to end — see [`docs/BACKLOG.md`](docs/BACKLOG.md) for what's shipped and what's left
+(accessibility/mobile hardening and launch seed content). See
+[`docs/VISION.md`](docs/VISION.md) for the full design.
 
 ## Local development
 
