@@ -97,31 +97,27 @@ export async function getVotedEntryIds(
   return new Set(results.map((row) => row.entryId));
 }
 
+// Mirrors insertEntry's INSERT OR IGNORE pattern: a single atomic write
+// decides the winner, so two concurrent votes from the same visitor (a
+// double-click, a retried request) can't both pass a separate "does a vote
+// already exist" check before either has written — only one insert can
+// ever succeed against the (entry_id, voter_token) primary key.
 export async function castVote(
   db: D1Database,
   entryId: string,
   voterToken: string,
 ): Promise<{ voteCount: number; alreadyVoted: boolean }> {
-  const existing = await db
-    .prepare("SELECT 1 FROM votes WHERE entry_id = ? AND voter_token = ?")
-    .bind(entryId, voterToken)
-    .first();
-
-  if (existing) {
-    const entry = await db.prepare("SELECT vote_count as voteCount FROM entries WHERE id = ?").bind(entryId).first<{
-      voteCount: number;
-    }>();
-    return { voteCount: entry?.voteCount ?? 0, alreadyVoted: true };
-  }
-
-  await db
-    .prepare("INSERT INTO votes (entry_id, voter_token, created_at) VALUES (?, ?, ?)")
+  const { meta } = await db
+    .prepare("INSERT OR IGNORE INTO votes (entry_id, voter_token, created_at) VALUES (?, ?, ?)")
     .bind(entryId, voterToken, Date.now())
     .run();
-  await db.prepare("UPDATE entries SET vote_count = vote_count + 1 WHERE id = ?").bind(entryId).run();
+
+  if (meta.changes > 0) {
+    await db.prepare("UPDATE entries SET vote_count = vote_count + 1 WHERE id = ?").bind(entryId).run();
+  }
 
   const entry = await db.prepare("SELECT vote_count as voteCount FROM entries WHERE id = ?").bind(entryId).first<{
     voteCount: number;
   }>();
-  return { voteCount: entry?.voteCount ?? 0, alreadyVoted: false };
+  return { voteCount: entry?.voteCount ?? 0, alreadyVoted: meta.changes === 0 };
 }

@@ -120,20 +120,16 @@ class FakeD1 {
       return { first: null, results: rows, changes: 0 };
     }
 
-    if (sql.startsWith("SELECT 1 FROM votes WHERE entry_id = ? AND voter_token = ?")) {
-      const [entryId, voterToken] = args as [string, string];
-      const found = this.votes.some((v) => v.entry_id === entryId && v.voter_token === voterToken);
-      return { first: found ? { 1: 1 } : null, results: [], changes: 0 };
-    }
-
     if (sql.startsWith("SELECT vote_count as voteCount FROM entries WHERE id = ?")) {
       const [entryId] = args as [string];
       const entry = this.entries.find((e) => e.id === entryId);
       return { first: entry ? { voteCount: entry.vote_count } : null, results: [], changes: 0 };
     }
 
-    if (sql.startsWith("INSERT INTO votes")) {
+    if (sql.startsWith("INSERT OR IGNORE INTO votes")) {
       const [entryId, voterToken, createdAt] = args as [string, string, number];
+      const duplicate = this.votes.some((v) => v.entry_id === entryId && v.voter_token === voterToken);
+      if (duplicate) return { first: null, results: [], changes: 0 };
       this.votes.push({ entry_id: entryId, voter_token: voterToken, created_at: createdAt });
       return { first: null, results: [], changes: 1 };
     }
