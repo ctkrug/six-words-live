@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Composer } from "@/components/Composer";
 import { MuteToggle } from "@/components/MuteToggle";
@@ -175,7 +176,12 @@ export default function HomePage() {
     <main className={styles.container}>
       <div className={styles.topBar}>
         <Wordmark />
-        <MuteToggle muted={muted} onToggle={handleToggleMute} />
+        <div className={styles.topBarActions}>
+          <Link href="/archive" className={styles.archiveLink}>
+            Archive
+          </Link>
+          <MuteToggle muted={muted} onToggle={handleToggleMute} />
+        </div>
       </div>
 
       <PromptBanner text={promptText} />
