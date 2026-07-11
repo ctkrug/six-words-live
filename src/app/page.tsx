@@ -176,6 +176,11 @@ export default function HomePage() {
       setEntries((prev) =>
         prev.map((entry) => (entry.id === entryId ? { ...entry, voteCount: data.voteCount!, votedByMe: true } : entry)),
       );
+      if (wallErrorTimeoutRef.current) {
+        clearTimeout(wallErrorTimeoutRef.current);
+        wallErrorTimeoutRef.current = null;
+      }
+      setWallError(null);
     } catch (error) {
       setEntries((prev) =>
         prev.map((entry) => (entry.id === entryId ? { ...entry, voteCount: target.voteCount, votedByMe: target.votedByMe } : entry)),
