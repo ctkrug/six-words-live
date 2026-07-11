@@ -141,6 +141,17 @@ describe("sound with a mocked WebAudio browser environment", () => {
     expect(() => play("submit")).not.toThrow();
   });
 
+  it("round-trips both the muted and unmuted state through localStorage", async () => {
+    vi.stubGlobal("window", { localStorage: mockLocalStorage() });
+    const { getStoredMute: storedMute, setStoredMute: setMute } = await import("@/lib/sound");
+
+    setMute(true);
+    expect(storedMute()).toBe(true);
+
+    setMute(false);
+    expect(storedMute()).toBe(false);
+  });
+
   it("treats a throwing localStorage (private mode, quota) as unmuted rather than throwing", async () => {
     const throwingStorage = {
       getItem: () => {
