@@ -82,6 +82,16 @@ describe("insertEntry / hasSubmittedToday", () => {
     });
     expect(secondDay).toBe(true);
   });
+
+  it("only lets one of two concurrent submissions from the same visitor land", async () => {
+    await getOrCreatePrompt(db, "2026-03-05", "prompt");
+    const [first, second] = await Promise.all([
+      insertEntry(db, { id: "e1", promptId: "2026-03-05", body: "first concurrent entry today here", authorToken: "visitor-a", createdAt: 1 }),
+      insertEntry(db, { id: "e2", promptId: "2026-03-05", body: "second concurrent entry today here", authorToken: "visitor-a", createdAt: 2 }),
+    ]);
+    expect([first, second].filter(Boolean)).toHaveLength(1);
+    expect((await listEntries(db, "2026-03-05", "new")).length).toBe(1);
+  });
 });
 
 describe("listEntries", () => {
