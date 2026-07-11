@@ -14,6 +14,10 @@ export default function ArchiveIndexPage() {
   const [status, setStatus] = useState<LoadState>("loading");
 
   useEffect(() => {
+    document.title = "The archive · Six Words Live";
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
     fetch("/api/archive", { cache: "no-store" })
       .then((response) => {
