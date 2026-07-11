@@ -35,16 +35,22 @@ export default function HomePage() {
   const sortRef = useRef<SortMode>("new");
   const wallErrorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const entriesRequestIdRef = useRef(0);
+  const promptRequestIdRef = useRef(0);
 
   useEffect(() => {
     setMuted(getStoredMute());
   }, []);
 
   const loadPrompt = useCallback(async () => {
+    // Mirrors loadEntries's stale-response guard: the mount call and the
+    // rollover-triggered call could in principle resolve out of order.
+    const requestId = ++promptRequestIdRef.current;
     try {
       const response = await fetch("/api/prompt", { cache: "no-store" });
+      if (requestId !== promptRequestIdRef.current) return;
       if (!response.ok) return;
       const data = (await response.json()) as { prompt: { text: string } };
+      if (requestId !== promptRequestIdRef.current) return;
       setPromptText(data.prompt.text);
     } catch {
       // A poll tick offline or mid-flake is a no-op; the next tick retries.
