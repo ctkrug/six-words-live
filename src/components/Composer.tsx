@@ -48,7 +48,10 @@ export function Composer({ ownEntry, submitting, onSubmit }: ComposerProps) {
       <textarea
         className={styles.field}
         value={body}
-        onChange={(event) => setBody(event.target.value)}
+        onChange={(event) => {
+          setBody(event.target.value);
+          if (error) setError(null);
+        }}
         placeholder="Write exactly six words against today's prompt&hellip;"
         aria-label="Your six-word story"
         aria-invalid={error ? "true" : "false"}
