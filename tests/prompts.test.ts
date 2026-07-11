@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { countWords, isValidSixWordEntry, promptTextForDate, utcDateKey } from "@/lib/prompts";
+import { PROMPT_BANK, countWords, isValidSixWordEntry, promptTextForDate, utcDateKey } from "@/lib/prompts";
 
 describe("promptTextForDate", () => {
   it("returns the same prompt for the same UTC day regardless of time", () => {
@@ -12,6 +12,23 @@ describe("promptTextForDate", () => {
     const day1 = new Date("2026-03-05T12:00:00Z");
     const day2 = new Date("2026-03-06T12:00:00Z");
     expect(promptTextForDate(day1)).not.toBe(promptTextForDate(day2));
+  });
+
+  // Pins the exact day->index mapping against independently-reasoned dates
+  // (not derived from the implementation) so an off-by-one in the epoch-day
+  // arithmetic — which the same-day/different-day checks above can't catch,
+  // since a uniform shift still satisfies both — fails a test.
+  it("maps the Unix epoch day to the first bank entry", () => {
+    expect(promptTextForDate(new Date("1970-01-01T00:00:00Z"))).toBe(PROMPT_BANK[0]);
+  });
+
+  it("advances one bank index per day from the epoch", () => {
+    expect(promptTextForDate(new Date("1970-01-02T00:00:00Z"))).toBe(PROMPT_BANK[1]);
+    expect(promptTextForDate(new Date("1970-01-15T00:00:00Z"))).toBe(PROMPT_BANK[14]);
+  });
+
+  it("wraps back to the first entry after a full bank cycle", () => {
+    expect(promptTextForDate(new Date("1970-01-16T00:00:00Z"))).toBe(PROMPT_BANK[0]);
   });
 });
 
