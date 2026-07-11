@@ -26,7 +26,7 @@ not a CRUD app.
 You submit your line and instantly land in a live-scrolling wall of everyone else's take on
 the exact same six words.
 
-## Planned features
+## Features
 
 - One shared six-word-story prompt per UTC day, the same for every visitor.
 - A live wall of submissions that updates without a manual refresh.
@@ -46,9 +46,9 @@ the exact same six words.
 
 ## Status
 
-The live wall, the daily prompt, voting, and the midnight archive are built and working
-end to end — see [`docs/BACKLOG.md`](docs/BACKLOG.md) for what's shipped and what's left
-(accessibility/mobile hardening and launch seed content). See
+Every story across all four epics — the live wall, voting, the midnight archive, and
+accessibility/mobile/seed-data hardening — is built, tested, and working end to end; see
+[`docs/BACKLOG.md`](docs/BACKLOG.md) for the full acceptance criteria. See
 [`docs/VISION.md`](docs/VISION.md) for the full design.
 
 ## Local development
