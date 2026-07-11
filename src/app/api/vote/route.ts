@@ -21,8 +21,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Too many votes. Slow down." }, { status: 429 });
   }
 
-  const { voteCount, alreadyVoted } = await castVote(DB, body.entryId, token);
-  const response = NextResponse.json({ voteCount, alreadyVoted });
+  const result = await castVote(DB, body.entryId, token);
+  if (!result) {
+    return NextResponse.json({ error: "That entry doesn't exist." }, { status: 404 });
+  }
+
+  const response = NextResponse.json(result);
   if (isNew) response.headers.set("set-cookie", visitorCookieHeader(token));
   return response;
 }

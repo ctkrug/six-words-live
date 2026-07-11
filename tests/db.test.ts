@@ -134,7 +134,9 @@ describe("castVote", () => {
 
   it("does not double-count two concurrent votes from the same voter", async () => {
     const [first, second] = await Promise.all([castVote(db, "e1", "voter-1"), castVote(db, "e1", "voter-1")]);
-    const byVoteCount = [first, second].sort((a, b) => a.voteCount - b.voteCount);
+    expect(first).not.toBeNull();
+    expect(second).not.toBeNull();
+    const byVoteCount = [first!, second!].sort((a, b) => a.voteCount - b.voteCount);
     expect(byVoteCount).toEqual([
       { voteCount: 1, alreadyVoted: false },
       { voteCount: 1, alreadyVoted: true },

@@ -126,6 +126,12 @@ class FakeD1 {
       return { first: entry ? { voteCount: entry.vote_count } : null, results: [], changes: 0 };
     }
 
+    if (sql.startsWith("SELECT 1 FROM entries WHERE id = ?")) {
+      const [entryId] = args as [string];
+      const found = this.entries.some((e) => e.id === entryId);
+      return { first: found ? { 1: 1 } : null, results: [], changes: 0 };
+    }
+
     if (sql.startsWith("INSERT OR IGNORE INTO votes")) {
       const [entryId, voterToken, createdAt] = args as [string, string, number];
       // The real schema has `votes.entry_id REFERENCES entries(id)`, which D1

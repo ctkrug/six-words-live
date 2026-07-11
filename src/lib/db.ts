@@ -102,11 +102,20 @@ export async function getVotedEntryIds(
 // double-click, a retried request) can't both pass a separate "does a vote
 // already exist" check before either has written — only one insert can
 // ever succeed against the (entry_id, voter_token) primary key.
+//
+// Checks the entry exists first: votes.entry_id is a foreign key onto
+// entries(id), so voting for an id that doesn't exist (a stale or forged
+// client value) would otherwise throw a constraint violation out of the
+// insert instead of failing cleanly. Returns null for that case so the
+// route can turn it into a 404 rather than a 500.
 export async function castVote(
   db: D1Database,
   entryId: string,
   voterToken: string,
-): Promise<{ voteCount: number; alreadyVoted: boolean }> {
+): Promise<{ voteCount: number; alreadyVoted: boolean } | null> {
+  const entryExists = await db.prepare("SELECT 1 FROM entries WHERE id = ?").bind(entryId).first();
+  if (!entryExists) return null;
+
   const { meta } = await db
     .prepare("INSERT OR IGNORE INTO votes (entry_id, voter_token, created_at) VALUES (?, ?, ?)")
     .bind(entryId, voterToken, Date.now())
