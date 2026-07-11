@@ -40,48 +40,56 @@ export default function HomePage() {
   }, []);
 
   const loadPrompt = useCallback(async () => {
-    const response = await fetch("/api/prompt", { cache: "no-store" });
-    if (!response.ok) return;
-    const data = (await response.json()) as { prompt: { text: string } };
-    setPromptText(data.prompt.text);
+    try {
+      const response = await fetch("/api/prompt", { cache: "no-store" });
+      if (!response.ok) return;
+      const data = (await response.json()) as { prompt: { text: string } };
+      setPromptText(data.prompt.text);
+    } catch {
+      // A poll tick offline or mid-flake is a no-op; the next tick retries.
+    }
   }, []);
 
   const loadEntries = useCallback(
     async (sortMode: SortMode, isInitial: boolean) => {
-      const response = await fetch(`/api/entries?sort=${sortMode}`, { cache: "no-store" });
-      if (!response.ok) return;
-      const data = (await response.json()) as EntriesResponse;
+      try {
+        const response = await fetch(`/api/entries?sort=${sortMode}`, { cache: "no-store" });
+        if (!response.ok) return;
+        const data = (await response.json()) as EntriesResponse;
 
-      if (promptIdRef.current !== null && data.promptId !== promptIdRef.current) {
-        // UTC day rolled over mid-session: cross-fade into the fresh prompt
-        // instead of animating every old entry away.
-        seenIdsRef.current = seedSeenIds(data.entries);
+        if (promptIdRef.current !== null && data.promptId !== promptIdRef.current) {
+          // UTC day rolled over mid-session: cross-fade into the fresh prompt
+          // instead of animating every old entry away.
+          seenIdsRef.current = seedSeenIds(data.entries);
+          promptIdRef.current = data.promptId;
+          setPromptId(data.promptId);
+          setEntries(data.entries.map((entry) => ({ ...entry, justArrived: false })));
+          setAnnouncement("A new prompt just started.");
+          void loadPrompt();
+          setNow(Date.now());
+          return;
+        }
+
         promptIdRef.current = data.promptId;
         setPromptId(data.promptId);
-        setEntries(data.entries.map((entry) => ({ ...entry, justArrived: false })));
-        setAnnouncement("A new prompt just started.");
-        void loadPrompt();
-        setNow(Date.now());
-        return;
-      }
 
-      promptIdRef.current = data.promptId;
-      setPromptId(data.promptId);
-
-      if (isInitial) {
-        seenIdsRef.current = seedSeenIds(data.entries);
-        setEntries(data.entries.map((entry) => ({ ...entry, justArrived: false })));
-      } else {
-        const { entries: annotated, seenIds } = annotateArrivals(data.entries, seenIdsRef.current);
-        seenIdsRef.current = seenIds;
-        const arrivedCount = annotated.filter((entry) => entry.justArrived).length;
-        if (arrivedCount > 0) {
-          setAnnouncement(`${arrivedCount} new ${arrivedCount === 1 ? "story" : "stories"} just landed`);
-          playSound("arrival");
+        if (isInitial) {
+          seenIdsRef.current = seedSeenIds(data.entries);
+          setEntries(data.entries.map((entry) => ({ ...entry, justArrived: false })));
+        } else {
+          const { entries: annotated, seenIds } = annotateArrivals(data.entries, seenIdsRef.current);
+          seenIdsRef.current = seenIds;
+          const arrivedCount = annotated.filter((entry) => entry.justArrived).length;
+          if (arrivedCount > 0) {
+            setAnnouncement(`${arrivedCount} new ${arrivedCount === 1 ? "story" : "stories"} just landed`);
+            playSound("arrival");
+          }
+          setEntries(annotated);
         }
-        setEntries(annotated);
+        setNow(Date.now());
+      } catch {
+        // A poll tick offline or mid-flake is a no-op; the next tick retries.
       }
-      setNow(Date.now());
     },
     [loadPrompt],
   );
