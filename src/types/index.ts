@@ -20,6 +20,15 @@ export interface ArchivedPromptSummary {
   entryCount: number;
 }
 
+// A frozen entry as shown in the read-only archive detail view — no
+// `votedByMe`/`isMine`, since those are meaningless once voting is closed.
+export interface ArchivedEntry {
+  id: string;
+  body: string;
+  voteCount: number;
+  createdAt: number;
+}
+
 export interface CloudflareEnv {
   DB: D1Database;
   VOTES_KV: KVNamespace;
